@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bags City</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'VT323', monospace;
+      background: linear-gradient(135deg, #d4a574 0%, #c49560 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+    }
+
+    .container {
+      display: flex;
+      gap: 24px;
+      width: 100vw;
+      height: 100vh;
+      padding: 24px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 320px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
+      border: 4px solid #8b7355;
+      border-radius: 12px;
+      padding: 32px 28px;
+      box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .sidebar-title {
+      font-size: 26px;
+      color: #6b5339;
+      margin-bottom: 32px;
+      text-align: center;
+      letter-spacing: 3px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #d4a574;
+      font-weight: bold;
+    }
+
+    .stat-box {
+      background: linear-gradient(135deg, #faf8f3 0%, #f0ebe0 100%);
+      border: 3px solid #8b7355;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      transition: transform 0.2s;
+    }
+
+    .stat-box:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 18px;
+      color: #8b7355;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 42px;
+      color: #6b4423;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    /* Settings Section */
+    .settings-section {
+      margin-bottom: 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, #faf8f3 0%, #f0ebe0 100%);
+      border: 3px solid #8b7355;
+      border-radius: 8px;
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .settings-title {
+      font-size: 18px;
+      color: #8b7355;
+      margin-bottom: 12px;
+      text-align: center;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .settings-btn {
+      width: 100%;
+      padding: 14px;
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      font-weight: bold;
+      border: 3px solid #8b7355;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .connect-btn {
+      background: linear-gradient(135deg, #90ee90 0%, #7dd87d 100%);
+      color: #1a6b1a;
+      box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
+    }
+
+    .connect-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(34, 139, 34, 0.4);
+    }
+
+    .disconnect-btn {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+      color: #8b0000;
+      box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+    }
+
+    .disconnect-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(139, 0, 0, 0.4);
+    }
+
+    .settings-btn.hidden {
+      display: none;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: auto;
+      padding: 16px;
+      background: linear-gradient(135deg, #90ee90 0%, #7dd87d 100%);
+      border: 3px solid #228b22;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
+    }
+
+    .status-dot {
+      width: 14px;
+      height: 14px;
+      background: #228b22;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(34, 139, 34, 0.8);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.95); }
+    }
+
+    .status-text {
+      font-size: 22px;
+      color: #1a6b1a;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* Terminal Window */
+    .terminal-window {
+      flex: 1;
+      background: #1a4d5c;
+      border: 8px solid #8b7355;
+      border-radius: 12px;
+      box-shadow: 
+        0 0 0 3px #5a4a3a,
+        0 12px 48px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Title Bar */
+    .title-bar {
+      background: linear-gradient(180deg, #0d2b36 0%, #0a1f28 100%);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #000;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .title-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-icon {
+      width: 18px;
+      height: 18px;
+      background: #00ff00;
+      border: 2px solid #00cc00;
+      border-radius: 2px;
+      box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+    }
+
+    .title-text {
+      font-size: 22px;
+      color: #00ff00;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .window-btn {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #000;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      border-radius: 3px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .window-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .minimize { background: linear-gradient(135deg, #ffd700 0%, #ffcc00 100%); }
+    .maximize { background: linear-gradient(135deg, #90ee90 0%, #7dd87d 100%); }
+    .close { background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%); }
+
+    /* Top Bar */
+    .top-bar {
+      background: linear-gradient(180deg, #e8d4b8 0%, #d4c0a8 100%);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      border-bottom: 4px solid #8b7355;
+      box-shadow: 
+        inset 0 1px 0 #fff5e6,
+        0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+      font-size: 28px;
+      color: #6b4423;
+      font-weight: bold;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 0 rgba(139, 69, 19, 0.3);
+    }
+
+    .search-bar {
+      flex: 1;
+      max-width: 700px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 18px;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      border: 3px solid #8b7355;
+      background: #ffffff;
+      box-shadow: 
+        inset 3px 3px 6px rgba(0, 0, 0, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      padding: 10px 20px;
+      border: 3px solid #228b22;
+      border-radius: 6px;
+    }
+
+    .live-dot {
+      width: 14px;
+      height: 14px;
+      background: #00ff00;
+      border: 2px solid #00cc00;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(0, 255, 0, 0.7);
+      animation: pulse 1.5s infinite;
+    }
+
+    .live-text {
+      font-size: 22px;
+      color: #228b22;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    /* City Canvas */
+    .city-canvas {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #1a2530;
+      border: 8px solid #2a3640;
+      box-shadow: inset 0 0 0 4px #1a2028;
+    }
+
+    .city-world {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-image: url('city-background.png');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    /* Setup Instructions Overlay */
+    .setup-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      border: 4px solid #00ff88;
+      border-radius: 16px;
+      padding: 30px 40px;
+      text-align: center;
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.9);
+      z-index: 10000;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .setup-overlay.hidden {
+      display: none;
+    }
+
+    .setup-title {
+      font-size: 32px;
+      color: #00ff88;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+    }
+
+    .setup-steps {
+      text-align: left;
+      font-size: 18px;
+      color: #fff;
+      line-height: 1.8;
+      margin-bottom: 25px;
+    }
+
+    .setup-step {
+      margin-bottom: 15px;
+      padding-left: 30px;
+      position: relative;
+    }
+
+    .setup-step::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #00ff88;
+      font-size: 22px;
+    }
+
+    .setup-button {
+      background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+      color: #000;
+      border: none;
+      padding: 14px 35px;
+      font-size: 20px;
+      font-family: 'VT323', monospace;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(0, 255, 136, 0.4);
+      margin-top: 10px;
+    }
+
+    .setup-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 255, 136, 0.6);
+    }
+
+    /* Building Hotspots */
+    .building-zone {
+      position: absolute;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 10;
+      pointer-events: all;
+    }
+
+    .building-zone:hover {
+      transform: scale(1.05);
+      z-index: 100;
+    }
+
+    .building-label {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: #00ff88;
+      padding: 4px 10px;
+      font-size: 14px;
+      white-space: nowrap;
+      border: 2px solid #000;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 1;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      letter-spacing: 0.5px;
+    }
+
+    /* Project Panel */
+    .project-panel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
+      border: 4px solid #00ff88;
+      border-radius: 16px;
+      padding: 40px;
+      min-width: 500px;
+      max-width: 700px;
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .project-panel.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 3px solid #d4a574;
+    }
+
+    .panel-title {
+      font-size: 32px;
+      color: #6b4423;
+      font-weight: bold;
+    }
+
+    .panel-close {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+      border: 2px solid #000;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #000;
+      transition: all 0.2s;
+    }
+
+    .panel-close:hover {
+      transform: scale(1.1);
+    }
+
+    .panel-content {
+      font-size: 20px;
+      color: #333;
+      line-height: 1.8;
+    }
+
+    .panel-row {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .panel-label {
+      font-weight: bold;
+      color: #8b7355;
+      min-width: 140px;
+    }
+
+    .panel-value {
+      color: #6b4423;
+    }
+
+    .panel-status {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #90ee90;
+      color: #1a6b1a;
+      border: 2px solid #228b22;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .panel-status.inactive {
+      background: #ddd;
+      color: #666;
+      border-color: #999;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 999;
+    }
+
+    .overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Gear Button */
+    .gear-btn {
+      width: 42px;
+      height: 42px;
+      font-size: 26px;
+      background: linear-gradient(135deg, #d4a574 0%, #c49560 100%);
+      border: 3px solid #8b7355;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+      flex-shrink: 0;
+      z-index: 50;
+      pointer-events: all;
+    }
+
+    .gear-btn:hover {
+      transform: rotate(30deg) scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    }
+
+    /* Settings Panel */
+    .settings-panel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
+      border: 4px solid #8b7355;
+      border-radius: 16px;
+      padding: 40px;
+      min-width: 500px;
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .settings-panel.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .connect-claude-btn {
+      width: 100%;
+      padding: 16px;
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      background: linear-gradient(135deg, #90ee90 0%, #7dd87d 100%);
+      border: 3px solid #228b22;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #1a6b1a;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
+    }
+
+    .connect-claude-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(34, 139, 34, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-title">CLAUDE ACCOUNT</div>
+      
+      <div class="stat-box">
+        <div class="stat-label">Total Projects</div>
+        <div class="stat-value">18</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-label">Artifacts Created</div>
+        <div class="stat-value">324</div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-label">Active Projects</div>
+        <div class="stat-value">7</div>
+      </div>
+
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <div class="status-text">CONNECTED</div>
+      </div>
+    </div>
+
+    <!-- Terminal Window -->
+    <div class="terminal-window">
+      <!-- Title Bar -->
+      <div class="title-bar">
+        <div class="title-left">
+          <div class="title-icon"></div>
+          <div class="title-text">BAGS_CITY.EXE</div>
+        </div>
+        <div class="window-controls">
+          <div class="window-btn minimize">_</div>
+          <div class="window-btn maximize">□</div>
+          <div class="window-btn close">×</div>
+        </div>
+      </div>
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div class="logo">BAGS CITY</div>
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="SEARCH PROJECT...">
+        </div>
+        <div id="settingsBtn" class="gear-btn">⚙️</div>
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          <div class="live-text">LIVE</div>
+        </div>
+      </div>
+
+      <!-- City Canvas -->
+      <div class="city-canvas" id="canvas">
+        <div class="city-world" id="cityWorld">
+          <!-- Building Zones for wide city - better distributed to avoid overlap -->
+          <!-- Top row -->
+          <div class="building-zone" style="left: 10%; top: 20%; width: 120px; height: 90px;" data-project="api-gateway">
+            <div class="building-label">API_GATEWAY</div>
+          </div>
+
+          <div class="building-zone" style="left: 32%; top: 18%; width: 100px; height: 90px;" data-project="database">
+            <div class="building-label">DATABASE</div>
+          </div>
+
+          <div class="building-zone" style="left: 48%; top: 20%; width: 110px; height: 90px;" data-project="marketing">
+            <div class="building-label">MARKETING</div>
+          </div>
+
+          <div class="building-zone" style="left: 62%; top: 18%; width: 90px; height: 90px;" data-project="blog">
+            <div class="building-label">BLOG</div>
+          </div>
+
+          <div class="building-zone" style="left: 75%; top: 20%; width: 100px; height: 90px;" data-project="ml-model">
+            <div class="building-label">ML_MODEL</div>
+          </div>
+
+          <!-- Middle row -->
+          <div class="building-zone" style="left: 88%; top: 22%; width: 100px; height: 90px;" data-project="analytics">
+            <div class="building-label">ANALYTICS</div>
+          </div>
+
+          <div class="building-zone" style="left: 18%; top: 45%; width: 110px; height: 90px;" data-project="cache">
+            <div class="building-label">CACHE_SERVICE</div>
+          </div>
+
+          <div class="building-zone" style="left: 55%; top: 48%; width: 100px; height: 90px;" data-project="prototype">
+            <div class="building-label">PROTOTYPE</div>
+          </div>
+
+          <div class="building-zone" style="left: 70%; top: 45%; width: 90px; height: 90px;" data-project="metrics">
+            <div class="building-label">METRICS</div>
+          </div>
+
+          <div class="building-zone" style="left: 84%; top: 50%; width: 80px; height: 90px;" data-project="search">
+            <div class="building-label">SEARCH</div>
+          </div>
+
+          <!-- Bottom row -->
+          <div class="building-zone" style="left: 10%; top: 72%; width: 110px; height: 90px;" data-project="auth">
+            <div class="building-label">AUTH_SERVICE</div>
+          </div>
+
+          <div class="building-zone" style="left: 28%; top: 75%; width: 90px; height: 90px;" data-project="ui-kit">
+            <div class="building-label">UI_KIT</div>
+          </div>
+
+          <div class="building-zone" style="left: 42%; top: 72%; width: 80px; height: 90px;" data-project="docs">
+            <div class="building-label">DOCS</div>
+          </div>
+
+          <div class="building-zone" style="left: 54%; top: 75%; width: 90px; height: 90px;" data-project="testing">
+            <div class="building-label">TESTING</div>
+          </div>
+
+          <div class="building-zone" style="left: 68%; top: 72%; width: 100px; height: 90px;" data-project="websocket">
+            <div class="building-label">WEBSOCKET</div>
+          </div>
+        </div>
+
+        <div class="overlay" id="overlay"></div>
+
+        <div class="project-panel" id="projectPanel">
+          <div class="panel-header">
+            <div class="panel-title" id="panelTitle">PROJECT NAME</div>
+            <div class="panel-close" id="panelClose">×</div>
+          </div>
+          <div class="panel-content" id="panelContent">
+            <div class="panel-row">
+              <div class="panel-label">Status:</div>
+              <div class="panel-value"><span class="panel-status" id="panelStatus">ACTIVE</span></div>
+            </div>
+            <div class="panel-row">
+              <div class="panel-label">Type:</div>
+              <div class="panel-value" id="panelType">Code Project</div>
+            </div>
+            <div class="panel-row">
+              <div class="panel-label">Artifacts:</div>
+              <div class="panel-value" id="panelArtifacts">24</div>
+            </div>
+            <div class="panel-row">
+              <div class="panel-label">Last Updated:</div>
+              <div class="panel-value" id="panelUpdated">2 hours ago</div>
+            </div>
+            <div class="panel-row">
+              <div class="panel-label">Description:</div>
+              <div class="panel-value" id="panelDescription">Project description</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-panel" id="settingsPanel">
+          <div class="panel-header">
+            <div class="panel-title">⚙️ SETTINGS</div>
+            <div class="panel-close" id="settingsClose">×</div>
+          </div>
+          <div class="panel-content">
+            <div style="margin-bottom: 24px;">
+              <h3 style="font-size: 24px; color: #6b4423; margin-bottom: 16px;">Claude API Integration</h3>
+              <p style="font-size: 18px; color: #666; margin-bottom: 20px;">Connect your Claude API to enable real-time project updates and AI-powered features.</p>
+            </div>
+            <button class="connect-claude-btn" id="connectClaudeBtn">
+              <span style="font-size: 28px;">🔌</span>
+              CONNECT TO CLAUDE
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const projects = {
+      'api-gateway': { name: 'API Gateway', status: 'active', type: 'Code Project', artifacts: 32, updated: '1 hour ago', description: 'Central API gateway handling all incoming requests and routing to microservices.' },
+      'auth': { name: 'Auth Service', status: 'active', type: 'Code Project', artifacts: 28, updated: '3 hours ago', description: 'Authentication and authorization service with JWT token management.' },
+      'database': { name: 'Database', status: 'active', type: 'Code Project', artifacts: 45, updated: '30 minutes ago', description: 'PostgreSQL database with optimized schemas and migration scripts.' },
+      'marketing': { name: 'Marketing Site', status: 'inactive', type: 'Creative Project', artifacts: 18, updated: '2 days ago', description: 'Marketing landing pages and promotional materials.' },
+      'ml-model': { name: 'ML Model', status: 'active', type: 'Code Project', artifacts: 56, updated: '15 minutes ago', description: 'Machine learning model for predictive analytics.' },
+      'blog': { name: 'Blog Platform', status: 'inactive', type: 'Creative Project', artifacts: 12, updated: '5 days ago', description: 'Company blog with CMS integration.' },
+      'ui-kit': { name: 'UI Kit', status: 'active', type: 'Creative Project', artifacts: 67, updated: '2 hours ago', description: 'Comprehensive design system with reusable components.' },
+      'docs': { name: 'Documentation', status: 'inactive', type: 'Documentation', artifacts: 89, updated: '1 day ago', description: 'Technical documentation and API references.' },
+      'websocket': { name: 'WebSocket Service', status: 'active', type: 'Code Project', artifacts: 21, updated: '45 minutes ago', description: 'Real-time bidirectional communication service.' },
+      'analytics': { name: 'Analytics Dashboard', status: 'active', type: 'Analysis Project', artifacts: 34, updated: '20 minutes ago', description: 'Real-time analytics with data visualization.' },
+      'testing': { name: 'Testing Suite', status: 'active', type: 'Code Project', artifacts: 43, updated: '1 hour ago', description: 'Comprehensive testing framework.' },
+      'cache': { name: 'Cache Service', status: 'inactive', type: 'Code Project', artifacts: 15, updated: '3 days ago', description: 'Redis-based caching layer.' },
+      'prototype': { name: 'Prototype', status: 'inactive', type: 'Creative Project', artifacts: 8, updated: '1 week ago', description: 'Interactive prototype for new features.' },
+      'search': { name: 'Search Engine', status: 'active', type: 'Code Project', artifacts: 38, updated: '30 minutes ago', description: 'Elasticsearch-powered search.' },
+      'metrics': { name: 'Metrics Tracker', status: 'active', type: 'Analysis Project', artifacts: 27, updated: '1 hour ago', description: 'Performance metrics collection system.' }
+    };
+
+    function hideSetup() {
+      document.getElementById('setupOverlay').classList.add('hidden');
+    }
+
+    setTimeout(hideSetup, 3000);
+
+    const canvas = document.getElementById('canvas');
+    const world = document.getElementById('cityWorld');
+
+    // No dragging, no zooming - just click on buildings!
+
+    const buildingZones = document.querySelectorAll('.building-zone');
+    const projectPanel = document.getElementById('projectPanel');
+    const overlay = document.getElementById('overlay');
+    const panelClose = document.getElementById('panelClose');
+
+    // Settings panel
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const settingsClose = document.getElementById('settingsClose');
+    const connectClaudeBtn = document.getElementById('connectClaudeBtn');
+
+    // Open settings panel
+    settingsBtn.addEventListener('click', () => {
+      settingsPanel.classList.add('active');
+      overlay.classList.add('active');
+    });
+
+    // Close settings panel
+    settingsClose.addEventListener('click', () => {
+      settingsPanel.classList.remove('active');
+      overlay.classList.remove('active');
+    });
+
+    // Connect to Claude button (placeholder)
+    connectClaudeBtn.addEventListener('click', () => {
+      alert('Claude API integration coming soon! 🚀');
+    });
+
+    buildingZones.forEach(zone => {
+      zone.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const project = projects[zone.dataset.project];
+        if (project) {
+          document.getElementById('panelTitle').textContent = project.name;
+          document.getElementById('panelType').textContent = project.type;
+          document.getElementById('panelArtifacts').textContent = project.artifacts;
+          document.getElementById('panelUpdated').textContent = project.updated;
+          document.getElementById('panelDescription').textContent = project.description;
+          const statusEl = document.getElementById('panelStatus');
+          statusEl.textContent = project.status.toUpperCase();
+          statusEl.className = project.status === 'active' ? 'panel-status' : 'panel-status inactive';
+          projectPanel.classList.add('active');
+          overlay.classList.add('active');
+        }
+      });
+    });
+
+    function closePanel() {
+      projectPanel.classList.remove('active');
+      settingsPanel.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+
+    panelClose.addEventListener('click', closePanel);
+    overlay.addEventListener('click', closePanel);
+  </script>
+</body>
+</html>
